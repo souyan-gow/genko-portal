@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>利用ガイド｜GENKO ドキュメント</title>
+  <link rel="stylesheet" href="../assets/style.css?v=20261103">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-logo" href="../index.html">GENKO<small>ドキュメント</small></a>
+      <nav><a href="../index.html">一覧へ戻る</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="doc">
+      <span class="doc-kind">使い方</span>
+      <h1>利用ガイド</h1>
+      <p class="lead">GENKO のはじめ方から、作品の管理、書き方、設定、ファイルの読み書きまでを順に説明します。</p>
+
+      <nav class="toc">
+        <strong>目次</strong>
+        <ol>
+          <li><a href="#start">はじめ方</a></li>
+          <li><a href="#screens">画面の流れ</a></li>
+          <li><a href="#works">作品と章を管理する</a></li>
+          <li><a href="#write">書く</a></li>
+          <li><a href="#symbols">記号入力バー</a></li>
+          <li><a href="#status">枚数・文字数と保存の表示</a></li>
+          <li><a href="#settings">設定</a></li>
+          <li><a href="#files">ファイルの読み込み・書き出し</a></li>
+          <li><a href="#tips">スマホと PC の使い分け</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="start">1. はじめ方</h2>
+      <h3>開くブラウザ</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>端末</th><th>使うブラウザ</th></tr>
+          <tr><td>iPhone</td><td><strong>Safari</strong>（ホーム画面の Safari のアイコンから開く）</td></tr>
+          <tr><td>PC</td><td>Chrome</td></tr>
+        </table>
+      </div>
+      <div class="warn">
+        <p>iPhone では、<strong>Safari 以外ではログインできません</strong>。LINE などで届いたリンクを押すと、Safari ではない画面で開くことがあります。その場合は、Safari を開いてアドレスを入力し直してください。</p>
+      </div>
+
+      <h3>iPhone のホーム画面に置く</h3>
+      <ol class="steps">
+        <li>Safari で GENKO を開く</li>
+        <li>画面下の「共有」ボタン（四角から矢印が出ている形）を押す</li>
+        <li>「ホーム画面に追加」を選ぶ</li>
+      </ol>
+      <p>次からは、ホーム画面のアイコンから開けます。</p>
+
+      <h3>ログイン</h3>
+      <p>「Google でログイン」を押し、持ち主の Google アカウントを選びます。ほかのアカウントでは「このアカウントでは利用できません」と表示され、使えません。</p>
+      <p>ログインすると、<strong>前回最後に開いていた章</strong>がそのまま開きます。</p>
+
+      <h2 id="screens">2. 画面の流れ</h2>
+      <pre><code>作品一覧 → 章一覧 → 執筆
+   ↓         ↓        ↓
+  設定 ← 各画面の右上の ⚙ から開く</code></pre>
+      <p>左上の「←」で、ひとつ前の画面に戻ります。</p>
+
+      <h2 id="works">3. 作品と章を管理する</h2>
+      <h3>作品一覧</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>操作</th><th>やり方</th></tr>
+          <tr><td>作品を作る</td><td>「＋ 新しい作品」を押して作品名を入力。最初の章「第1話」も一緒にできます</td></tr>
+          <tr><td>開く</td><td>作品名を押すと、章一覧が開きます</td></tr>
+          <tr><td>名前を変える</td><td>「名前」を押して入力</td></tr>
+          <tr><td>並べ替える</td><td>「↑」「↓」で1つずつ動かす</td></tr>
+          <tr><td>削除する</td><td>「削除」を押し、確認で「OK」。<strong>中の章もすべて消え、元に戻せません</strong></td></tr>
+        </table>
+      </div>
+      <p>各作品には、原稿用紙換算の枚数、章の数、最終更新の日時が表示されます。</p>
+
+      <h3>章一覧</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>操作</th><th>やり方</th></tr>
+          <tr><td>章を足す</td><td>「＋ 章を追加」を押して章タイトルを入力。すぐに執筆画面が開きます</td></tr>
+          <tr><td>書く</td><td>章タイトルを押す</td></tr>
+          <tr><td>名前・並べ替え・削除</td><td>作品一覧と同じ</td></tr>
+          <tr><td>書き出す</td><td>「書出」でその章を .txt に保存（<a href="#files">8章</a>）</td></tr>
+        </table>
+      </div>
+
+      <h2 id="write">4. 書く</h2>
+      <p>執筆画面の上部にある［横書き｜原稿用紙］で、2つのモードを切り替えます。どちらも同じ本文で、切り替えてもカーソルの位置は引き継がれます。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th></th><th>横書きモード</th><th>原稿用紙モード</th></tr>
+          <tr><th>PC</th><td>ふつうの入力欄で書く</td><td><strong>マス目に直接書ける</strong>（開いたときはこちら）</td></tr>
+          <tr><th>スマホ</th><td><strong>ここで書く</strong>（開いたときはこちら）</td><td>見るだけ（書くときは横書きに切り替わる）</td></tr>
+        </table>
+      </div>
+
+      <h3>横書きモード</h3>
+      <ul>
+        <li>書いている間は、<code>｜吾輩《わがはい》</code> のように<strong>記法のまま</strong>表示されます</li>
+        <li>入力欄の外を押すと、<strong>ルビ・傍点付きの読む表示</strong>に切り替わります</li>
+        <li>読む表示で文字を押すと、その位置から続けて書けます</li>
+      </ul>
+
+      <h3>原稿用紙モード（PC）</h3>
+      <ul>
+        <li>マス目を押すと、そこにカーソルが移ります。行の終わりの空いたマスを押すと、その行の最後の文字の後ろに移ります</li>
+        <li>日本語入力で変換している途中の文字も、マス目に色付きで表示されます</li>
+        <li>ルビ（<code>｜《》</code>）の記号は見えません。カーソルは、表示されている文字ごとに動きます</li>
+      </ul>
+      <div class="table-wrap">
+        <table>
+          <tr><th>キー</th><th>動き</th></tr>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>前の文字へ／次の文字へ</td></tr>
+          <tr><td><kbd>→</kbd> <kbd>←</kbd></td><td>前の行（右隣）へ／次の行（左隣）へ</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>改行</td></tr>
+          <tr><td><kbd>Backspace</kbd> <kbd>Delete</kbd></td><td>前の文字を消す／後ろの文字を消す</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> ／ <kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>元に戻す／やり直す（横書きモードでも使えます）</td></tr>
+        </table>
+      </div>
+      <p>PC では、画面の左に章の一覧が出ます。押すと別の章へ移れます。「≪」でたたみ、「≫」で開きます。</p>
+
+      <h3>原稿用紙モード（スマホ）</h3>
+      <ul>
+        <li>1ページを、画面の幅に合わせて表示します</li>
+        <li>2本の指で広げると拡大、狭めると縮小します</li>
+        <li><strong>右へスワイプすると次のページ</strong>、左へスワイプすると前のページです（縦書きなので、ページは右から左へ進みます）。画面下のボタンでも移れます</li>
+        <li>文字を押すと横書きモードに切り替わり、その位置から書けます</li>
+      </ul>
+
+      <h2 id="symbols">5. 記号入力バー</h2>
+      <p>本文の下にあるボタンで、よく使う記号を1回で入れられます。スマホでは、キーボードのすぐ上に出ます。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>ボタン</th><th>入るもの</th></tr>
+          <tr><td>「」『』</td><td>括弧が対で入り、カーソルが中に移る。文字を選んでから押すと、選んだ文字を囲む</td></tr>
+          <tr><td>…… ――</td><td>2文字ずつ入る</td></tr>
+          <tr><td>！ ？ 、 全角空白</td><td>その記号が入る</td></tr>
+          <tr><td>ルビ</td><td>文字を選んでから押すと <code>｜選んだ文字《》</code> になり、《》の中でふりがなを打てる。選ばずに押すと <code>｜《》</code> が入る</td></tr>
+          <tr><td>傍点</td><td>選んだ文字を <code>《《》》</code> で囲む。選ばずに押すと <code>《《》》</code> が入り、中に打てる</td></tr>
+          <tr><td>元に戻す／やり直し</td><td>スマホのときだけ、左端に出る</td></tr>
+        </table>
+      </div>
+      <p>書き方の詳しい決まりは「<a href="notation.html">記法の早見表</a>」を見てください。</p>
+
+      <h2 id="status">6. 枚数・文字数と保存の表示</h2>
+      <p>上部バー（スマホでは章タイトルの下）に、次のように表示されます。</p>
+      <pre><code>3枚（2枚目15行）・1024字　保存済み</code></pre>
+      <ul>
+        <li><strong>枚数</strong>：原稿用紙換算の枚数。最後のページは、1マスでも使えば1枚と数えます</li>
+        <li><strong>◯枚目◯行</strong>：いまカーソルがある位置</li>
+        <li><strong>文字数</strong>：空白・改行・ルビ・記法の記号は数えません</li>
+      </ul>
+      <div class="table-wrap">
+        <table>
+          <tr><th>保存の表示</th><th>意味</th></tr>
+          <tr><td>未保存</td><td>入力が止まるのを待っています。2秒後に保存します</td></tr>
+          <tr><td>保存中…</td><td>サーバーに送っています</td></tr>
+          <tr><td>保存済み</td><td>サーバーに保存されました</td></tr>
+          <tr><td>オフライン（端末に保存）</td><td>通信が切れています。書いた内容は端末に残っていて、つながると自動で送られます</td></tr>
+          <tr><td>保存できませんでした</td><td>「<a href="faq.html#save-error">困ったときは</a>」を見てください</td></tr>
+        </table>
+      </div>
+
+      <h2 id="settings">7. 設定</h2>
+      <p>右上の ⚙ で開きます。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>内容</th></tr>
+          <tr><td>1行の字数 × 1枚の行数</td><td>それぞれ 10〜40 から選ぶ。変えるとすぐに割り付けと枚数が変わる。最初は 20字×20行（400字詰め）</td></tr>
+          <tr><td>プリセット</td><td>いまの字数×行数に名前を付けて保存しておき、1回で切り替えられる</td></tr>
+          <tr><td>段落の頭を自動で1字下げる</td><td>ON にすると、段落の頭が1マス空いて表示される。本文に空白は入らない。「 『 （ で始まる段落と、すでに全角空白で始まる段落は下げない</td></tr>
+          <tr><td>ログアウト</td><td>この端末からログアウトする</td></tr>
+        </table>
+      </div>
+      <h3>作品ごとの設定</h3>
+      <p>章一覧や執筆画面から ⚙ を開くと、「適用先」を選べます。</p>
+      <ul>
+        <li><strong>この作品だけに適用</strong>：その作品だけ字数×行数や字下げを変える（例：応募原稿だけ 40字×40行）</li>
+        <li><strong>すべての作品の既定値にする</strong>：個別の設定がない、すべての作品に効く</li>
+      </ul>
+      <p>「この作品の個別設定をやめる」を押すと、その作品は既定値に戻ります。</p>
+
+      <h2 id="files">8. ファイルの読み込み・書き出し</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>やりたいこと</th><th>場所</th><th>内容</th></tr>
+          <tr><td>.txt を読み込む</td><td>章一覧の「.txt を読み込む」</td><td>1ファイルが1章になる（章タイトルはファイル名）。UTF-8 と Shift_JIS を自動で見分ける。複数のファイルをまとめて選べる</td></tr>
+          <tr><td>章を書き出す</td><td>章一覧の各章の「書出」</td><td>その章の本文を .txt で保存</td></tr>
+          <tr><td>作品をまとめて書き出す</td><td>章一覧の「作品を .txt で書き出す」</td><td>全章を1つの .txt に。章の間に章タイトルの行が入る</td></tr>
+          <tr><td>全作品をバックアップ</td><td>作品一覧の「全作品をバックアップ」</td><td>全作品・全章・設定を1つのファイル（.json）に保存</td></tr>
+        </table>
+      </div>
+      <p>書き出した .txt では、ルビ・傍点はカクヨム式の記法のまま残ります。そのままカクヨムに貼り付けられます。</p>
+
+      <h2 id="tips">9. スマホと PC の使い分け</h2>
+      <ul>
+        <li><strong>移動中はスマホ</strong>で横書きモードを使い、どんどん書く</li>
+        <li><strong>自宅では PC</strong>で原稿用紙モードを使い、マス目で見ながら推敲する</li>
+        <li>保存は自動です。スマホで書いた内容は、PC でも再読み込みなしで数秒のうちに反映されます</li>
+        <li>同じ章を2台で同時に書くと、後から保存したほうが残ります。片方で書き終えてから、もう片方で開くのが安心です</li>
+      </ul>
+
+      <div class="doc-footer">
+        <span>対象：フェーズ1（MVP）</span>
+        <span>最終更新 2026-11-03</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

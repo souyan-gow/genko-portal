@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>詳細設計書｜GENKO ドキュメント</title>
+  <link rel="stylesheet" href="../assets/style.css?v=20261103">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-logo" href="../index.html">GENKO<small>ドキュメント</small></a>
+      <nav><a href="../index.html">一覧へ戻る</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="doc">
+      <span class="doc-kind">アプリの説明</span>
+      <h1>詳細設計書</h1>
+      <p class="lead">GENKO の中で、原稿用紙の割り付け・入力・保存がどのように動いているかを説明します。</p>
+
+      <nav class="toc">
+        <strong>目次</strong>
+        <ol>
+          <li><a href="#layout">原稿用紙の割り付け</a></li>
+          <li><a href="#rules">割り付けのルール</a></li>
+          <li><a href="#speed">長い章を速く扱う工夫</a></li>
+          <li><a href="#cursor">マス目上のカーソル</a></li>
+          <li><a href="#ime">日本語入力（変換中の文字）の扱い</a></li>
+          <li><a href="#yoko">横書きモードの「書く表示」と「読む表示」</a></li>
+          <li><a href="#sync">自動保存と同期</a></li>
+          <li><a href="#undo">元に戻す・やり直し</a></li>
+          <li><a href="#settings">設定の2段階</a></li>
+          <li><a href="#data">保存データの項目</a></li>
+          <li><a href="#io">ファイルの形式</a></li>
+          <li><a href="#security">アクセス規則</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="layout">1. 原稿用紙の割り付け</h2>
+      <p>GENKO の中心となる処理です。<strong>「本文＋設定」を受け取り、「どの行のどのマスに何を置くか」を返します</strong>。画面とは切り離した処理なので、自動テストで正しさを確かめられます。</p>
+      <ol class="steps">
+        <li><strong>段落に分ける</strong>：本文を改行で区切る。記法は段落をまたがない</li>
+        <li><strong>記法を読み取る</strong>：<code>｜漢字《かんじ》</code> や <code>《《傍点》》</code> を見つけ、親文字とルビ、傍点の範囲を取り出す。記号そのものは表示しない</li>
+        <li><strong>表示する文字の並びを作る</strong>：1文字ごとに「本文の何文字目か」を覚えておく（カーソルや削除に使う）</li>
+        <li><strong>マスにまとめる</strong>：「。」」のような句読点＋閉じ括弧を1マスに。2桁までの半角数字を1マスに</li>
+        <li><strong>行に詰める</strong>：段落の頭に字下げのマスを入れ、行の字数で折り返す。その際に禁則処理（ぶら下げ・行末禁則）を行う</li>
+        <li><strong>ルビの位置を決める</strong>：親文字がどの行のどのマスにあるかから、ルビを置く位置を決める。親文字が2行にまたがるときは、ルビの文字を親文字の数に合わせて分ける</li>
+      </ol>
+      <p>こうして作った行を、行数ごとに区切ったものがページです。<strong>マスの情報は保存せず、表示のたびに本文から作り直します</strong>。</p>
+
+      <h2 id="rules">2. 割り付けのルール</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>ID</th><th>ルール</th><th>例</th></tr>
+          <tr><td>B-01</td><td>ルビは親文字の右脇（横書きでは上）に小さく表示。マスを使わない。長くてもはみ出してよく、割り付けは変えない</td><td><code>｜漢字《かんじ》です</code> → 4マス</td></tr>
+          <tr><td>B-02</td><td>行頭禁則：<code>。、」』）】〉》！？</code> は行頭に置かず、前の行の最終マスに同居させる（2文字まで）。行末禁則：<code>「『（【〈</code> が最終マスに来るなら次の行へ送る</td><td>5字の行で <code>あいうえお。かきく</code> → 1行目の5マス目に「お。」</td></tr>
+          <tr><td>B-03</td><td><code>……</code> <code>――</code> は2マス。句読点の直後の <code>」』</code> は1マスに同居</td><td><code>「はい。」……</code> → 6マス</td></tr>
+          <tr><td>B-04</td><td>2桁以下の半角数字は1マスに横並び。3桁以上と英字は1文字1マス。本文は書き換えない</td><td><code>12月</code> → 2マス、<code>2026年</code> → 5マス</td></tr>
+          <tr><td>B-05</td><td>改行で次の行の頭へ。空行は1行分を空白として使う</td><td></td></tr>
+          <tr><td>B-06</td><td>自動字下げが ON なら段落の頭に1マスの空白。「『（ で始まる段落、全角空白で始まる段落には入れない。本文には空白を入れない</td><td></td></tr>
+          <tr><td>B-07</td><td>最終行まで埋まったら、段落の途中でも次のページへ続ける。禁則はページの境目でも同じ</td><td></td></tr>
+          <tr><td>B-10</td><td>枚数：最後のページは1マスでも使えば1枚。文字数：空白・改行・ルビ・記法の記号は数えない</td><td><code>｜漢字《かんじ》です。</code> → 5字</td></tr>
+        </table>
+      </div>
+      <p>これらのルールの例は、すべて自動テストにしてあります。</p>
+
+      <h2 id="speed">3. 長い章を速く扱う工夫</h2>
+      <p>1文字打つたびに本文全体を割り付けし直すと、長い章では時間がかかります（10万字で約30ミリ秒）。そこで次の工夫をしています。</p>
+      <ul>
+        <li><strong>段落ごとに結果を覚えておく</strong>：割り付けの結果を段落の中身ごとに覚えておき、変わっていない段落は使い回す。行の位置は「段落の先頭から何文字目か」で持ち、使うときに本文全体での位置に直す。これで10万字でも1文字あたり約1ミリ秒になった</li>
+        <li><strong>見えているページだけを描く</strong>：原稿用紙モードでは、画面に見えているページとその前後1ページだけを画面に描く</li>
+        <li><strong>中身の変わらないページは描き直さない</strong>：ページの中身を要約しておき、前と同じなら描き直しを省く</li>
+      </ul>
+
+      <h2 id="cursor">4. マス目上のカーソル</h2>
+      <p>カーソルの位置は「本文の何文字目か」で持ち、表示するときにマス目上の位置に直します。</p>
+      <ul>
+        <li><strong>見えない文字を飛ばす</strong>：原稿用紙では <code>｜《》</code> とルビの文字が見えない。そのため ↑↓ は、表示されている文字の前後だけを移る。見えない文字の上でカーソルが止まって見えるのを防ぐ</li>
+        <li><strong>ルビの外側に置く</strong>：ルビ付きの言葉の直前・直後にカーソルを置くと、記号の外側の位置になる。続けて打った文字が、ルビの中に入らない</li>
+        <li><strong>折り返しの境目</strong>：行の終わりと次の行の頭は、本文では同じ位置。ふつうは次の行の頭に表示するが、行末禁則で短くなった行の末尾へ ← → で移ったときは、その行に留まる</li>
+        <li><strong>← → の移動</strong>：隣の行の同じ高さのマスへ移る。短い行を通っても、元の高さを覚えておく</li>
+      </ul>
+      <h3>マス目上での削除</h3>
+      <ul>
+        <li>Backspace はカーソルの前の、表示されている1文字を消す。ルビの直後なら、親文字の最後の1文字を消す</li>
+        <li>親文字（傍点の文字）が1文字だけのときは、記号ごとまとめて消す（記号だけが残らないように）</li>
+        <li>段落の頭で Backspace を押すと、前の段落とつながる</li>
+      </ul>
+
+      <h2 id="ime">5. 日本語入力（変換中の文字）の扱い</h2>
+      <p>PC の原稿用紙モードでは、文字が透明で見えない入力欄をカーソルのマスに重ねて置き、日本語入力を受け取ります。表示はすべて GENKO が描くマス目で行います。</p>
+      <ol class="steps">
+        <li>変換が始まると、変換中の文字を本文のカーソル位置に<strong>仮に差し込んだ状態で割り付けし直す</strong></li>
+        <li>仮の文字は色付きで表示する。確定後と同じルールで割り付けるので、禁則なども含めて崩れない</li>
+        <li>確定すると、その文字を本当に本文に入れる</li>
+        <li>入力欄はカーソルの位置にあるので、変換候補の小窓も文字の近くに出る</li>
+      </ol>
+
+      <h2 id="yoko">6. 横書きモードの「書く表示」と「読む表示」</h2>
+      <p>スマホでも日本語入力が安定するよう、横書きモードではブラウザのふつうの入力欄を使います。ふつうの入力欄では文字の上にルビを載せられないため、2つの表示を切り替えます。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>表示</th><th>いつ</th><th>見え方</th></tr>
+          <tr><td>書く表示</td><td>入力欄にカーソルがある間</td><td>記法のまま（<code>｜吾輩《わがはい》</code>）</td></tr>
+          <tr><td>読む表示</td><td>入力欄から離れたとき</td><td>ルビ・傍点付き。段落の頭の字下げも反映</td></tr>
+        </table>
+      </div>
+      <p>読む表示の各文字は「本文の何文字目か」を持っています。押した文字の位置を求めて入力欄に切り替え、その位置にカーソルを置きます。スマホでキーボードを出すため、この切り替えは押した操作の中ですぐに行います。</p>
+
+      <h2 id="sync">7. 自動保存と同期</h2>
+      <figure>
+        <div class="figure-scroll"><svg viewBox="0 0 760 380" role="img" aria-label="スマホで書いた内容がサーバーに保存され、PC に届くまでの流れ">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" class="diagram-arrowhead" />
+            </marker>
+          </defs>
+          <rect x="40" y="16" width="160" height="40" rx="8" class="diagram-accent" />
+          <text x="120" y="42" text-anchor="middle" class="diagram-text">スマホ</text>
+          <rect x="300" y="16" width="160" height="40" rx="8" class="diagram-box" />
+          <text x="380" y="42" text-anchor="middle" class="diagram-text">サーバー（Firestore）</text>
+          <rect x="560" y="16" width="160" height="40" rx="8" class="diagram-accent" />
+          <text x="640" y="42" text-anchor="middle" class="diagram-text">PC</text>
+          <path d="M120,56 L120,360" class="diagram-line" stroke-dasharray="4 4" />
+          <path d="M380,56 L380,360" class="diagram-line" stroke-dasharray="4 4" />
+          <path d="M640,56 L640,360" class="diagram-line" stroke-dasharray="4 4" />
+
+          <text x="130" y="92" class="diagram-text">① 文字を打つ</text>
+          <text x="130" y="112" class="diagram-sub">表示：未保存</text>
+          <text x="130" y="142" class="diagram-text">② 2秒止まる</text>
+          <text x="130" y="162" class="diagram-sub">端末の中に先に保存</text>
+          <path d="M120,208 L378,208" class="diagram-line" marker-end="url(#arrow2)" />
+          <text x="250" y="200" text-anchor="middle" class="diagram-sub">③ 送る（表示：保存中…）</text>
+          <path d="M380,250 L122,250" class="diagram-line" marker-end="url(#arrow2)" />
+          <text x="250" y="242" text-anchor="middle" class="diagram-sub">④ 受け取った（表示：保存済み）</text>
+          <path d="M380,290 L638,290" class="diagram-line" marker-end="url(#arrow2)" />
+          <text x="510" y="282" text-anchor="middle" class="diagram-sub">⑤ 変わったことを知らせる</text>
+          <text x="410" y="325" class="diagram-text">⑥ PC が編集中でなければ、表示を更新</text>
+          <text x="410" y="345" class="diagram-sub">（打っている最中・未保存の内容があるときは書き換えない）</text>
+        </svg></div>
+        <figcaption>図1　スマホで書いた内容が PC に届くまで。ふつうは数秒で届く</figcaption>
+      </figure>
+      <div class="table-wrap">
+        <table>
+          <tr><th>決まり</th><th>内容</th></tr>
+          <tr><td>保存するとき</td><td>入力が止まってから2秒後。画面を離れる・章を切り替える・アプリを閉じるときは、待たずにすぐ</td></tr>
+          <tr><td>通信が切れているとき</td><td>端末の中に保存され、表示は「オフライン（端末に保存）」。つながると自動で送られる</td></tr>
+          <tr><td>ほかの端末の変更</td><td>サーバーから知らせが来たら表示を更新する。ただし、最後の入力から3秒以内（打っている最中）や、まだ保存していない内容があるときは書き換えない</td></tr>
+          <tr><td>自分の書いた変更</td><td>まだサーバーに届いていない自分の変更の知らせは、無視する</td></tr>
+          <tr><td>同時に書いたとき</td><td>後から保存したほうが残る（MVP の仕様。両方の版を残すのはフェーズ2）</td></tr>
+          <tr><td>保存に失敗したとき</td><td>表示は「保存できませんでした」。次に打ったとき、または画面を離れるときに、もう一度保存する</td></tr>
+        </table>
+      </div>
+
+      <h2 id="undo">8. 元に戻す・やり直し</h2>
+      <ul>
+        <li>ブラウザの入力欄の「元に戻す」は、プログラムで本文を書き換えると正しく動かなくなるため、GENKO が自分で履歴を持つ</li>
+        <li>横書きと原稿用紙の両モードで、同じ履歴を使う。戻すと、カーソルも編集前の位置に戻る</li>
+        <li>1秒より短い間隔で続けて打った文字は、まとめて1回で戻す。記号ボタンは1回ずつ戻す</li>
+        <li>履歴は300回分まで。章を開き直したとき、ほかの端末の変更が反映されたときは、履歴を消す</li>
+      </ul>
+
+      <h2 id="settings">9. 設定の2段階</h2>
+      <pre><code>実際に使う設定 ＝ すべての作品の既定値 ＋ 作品ごとの上書き（指定した項目だけ）</code></pre>
+      <ul>
+        <li>作品の中から設定を開いたときは、「この作品だけに適用」と「すべての作品の既定値にする」を選べる</li>
+        <li>「この作品だけ」を選んで変えると、その作品は表示中の値をすべて自分の設定として持つ。あとで既定値を変えても、その作品は変わらない</li>
+        <li>字数・行数は 10〜40 に収める。おかしな値が保存されていても、読み込むときに直す</li>
+      </ul>
+
+      <h2 id="data">10. 保存データの項目</h2>
+      <h3>ユーザー（users/ユーザーID）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>型</th><th>内容</th></tr>
+          <tr><td>settings.cols</td><td>数値</td><td>1行の字数（既定 20）</td></tr>
+          <tr><td>settings.rows</td><td>数値</td><td>1枚の行数（既定 20）</td></tr>
+          <tr><td>settings.autoIndent</td><td>真偽</td><td>自動字下げ（既定 ON）</td></tr>
+          <tr><td>settings.presets</td><td>一覧</td><td>保存したプリセット（名前、字数、行数）</td></tr>
+          <tr><td>lastOpened</td><td>まとまり</td><td>最後に開いた章（作品ID、章ID）</td></tr>
+          <tr><td>updatedAt</td><td>日時</td><td>更新日時</td></tr>
+        </table>
+      </div>
+      <h3>作品（…/works/作品ID）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>型</th><th>内容</th></tr>
+          <tr><td>title</td><td>文字</td><td>作品名</td></tr>
+          <tr><td>order</td><td>数値</td><td>作品一覧での並び順</td></tr>
+          <tr><td>settingsOverride</td><td>まとまり</td><td>作品ごとに上書きした設定（指定した項目だけ）</td></tr>
+          <tr><td>createdAt・updatedAt</td><td>日時</td><td>作成日時・更新日時</td></tr>
+        </table>
+      </div>
+      <h3>章（…/works/作品ID/chapters/章ID）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>型</th><th>内容</th></tr>
+          <tr><td>title</td><td>文字</td><td>章タイトル</td></tr>
+          <tr><td>order</td><td>数値</td><td>作品の中での並び順</td></tr>
+          <tr><td>body</td><td>文字</td><td>本文（カクヨム式の記法を含むプレーンテキスト）</td></tr>
+          <tr><td>charCount</td><td>数値</td><td>文字数（B-10 の数え方）。一覧に表示するため、保存のときに数える</td></tr>
+          <tr><td>updatedAt</td><td>日時</td><td>更新日時</td></tr>
+        </table>
+      </div>
+      <ul>
+        <li>並べ替えは、隣どうしの <code>order</code> を入れ替えて行う</li>
+        <li>作品を削除するときは、中の章もまとめて削除する（データベースは自動では消さないため）</li>
+        <li>作品を作るときは、最初の章「第1話」も一緒に作る</li>
+      </ul>
+
+      <h2 id="io">11. ファイルの形式</h2>
+      <h3>.txt の読み込み</h3>
+      <ul>
+        <li>ファイルの先頭の印（BOM）があれば、それに従う（UTF-8・UTF-16）</li>
+        <li>なければ UTF-8 として読み、読めない部分が1つでもあれば Shift_JIS として読み直す</li>
+        <li>改行は統一し、1ファイルを1章にする。章タイトルはファイル名から拡張子を外したもの</li>
+      </ul>
+      <h3>.txt の書き出し</h3>
+      <ul>
+        <li>文字コードは UTF-8。記法はカクヨム式のまま</li>
+        <li>作品まとめての場合は、各章を「章タイトル、空行、本文」とし、章の間に空行を2つ入れる</li>
+        <li>ファイル名に使えない記号（<code>\ / : * ? " &lt; &gt; |</code>）は「_」に置き換える</li>
+      </ul>
+      <h3>バックアップ（.json）</h3>
+      <pre><code>{
+  "app": "GENKO",
+  "exportedAt": "2026-11-03T12:00:00+09:00",
+  "settings": { "cols": 20, "rows": 20, "autoIndent": true, "presets": [] },
+  "works": [
+    {
+      "title": "作品名",
+      "order": 0,
+      "settingsOverride": {},
+      "chapters": [
+        { "title": "第1話", "order": 0, "body": "本文…" }
+      ]
+    }
+  ]
+}</code></pre>
+      <p>フェーズ1では書き出しのみ。バックアップからの復元は、フェーズ2で検討します。</p>
+
+      <h2 id="security">12. アクセス規則</h2>
+      <ul>
+        <li>サーバー側の規則で、<strong>ログインしていて、かつ持ち主本人のアカウントのときだけ</strong>、持ち主のデータを読み書きできる。それ以外はすべて拒否する</li>
+        <li>アプリの側でも、持ち主以外のアカウントでログインしたら、すぐにログアウトさせる（画面の出し分けのため。データの保護そのものはサーバー側の規則が担う）</li>
+        <li>Google でのログインは、小さな画面（ポップアップ）を開く方式。iPhone の Safari では、画面を切り替える方式がプライバシー保護の機能で失敗することがあるため</li>
+      </ul>
+
+      <div class="doc-footer">
+        <span>対象：フェーズ1（MVP）</span>
+        <span>最終更新 2026-11-03</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

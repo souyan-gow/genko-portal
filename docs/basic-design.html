@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>基本設計書｜GENKO ドキュメント</title>
+  <link rel="stylesheet" href="../assets/style.css?v=20261103">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-logo" href="../index.html">GENKO<small>ドキュメント</small></a>
+      <nav><a href="../index.html">一覧へ戻る</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="doc">
+      <span class="doc-kind">アプリの説明</span>
+      <h1>基本設計書</h1>
+      <p class="lead">GENKO の全体の構成、機能と画面の一覧、データの全体像をまとめます。</p>
+
+      <nav class="toc">
+        <strong>目次</strong>
+        <ol>
+          <li><a href="#architecture">全体の構成</a></li>
+          <li><a href="#functions">機能の一覧</a></li>
+          <li><a href="#screens">画面の一覧と行き来</a></li>
+          <li><a href="#layout">執筆画面の配置</a></li>
+          <li><a href="#data">データの全体像</a></li>
+          <li><a href="#nonfunctional">性能・安全性・費用の考え方</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="architecture">1. 全体の構成</h2>
+      <figure>
+        <div class="figure-scroll"><svg viewBox="0 0 760 330" role="img" aria-label="スマホと PC が Vercel からアプリを受け取り、Firebase でログインとデータの保存をする構成図">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" class="diagram-arrowhead" />
+            </marker>
+          </defs>
+          <!-- 端末 -->
+          <rect x="20" y="40" width="170" height="90" rx="10" class="diagram-accent" />
+          <text x="105" y="78" text-anchor="middle" class="diagram-text">iPhone（Safari）</text>
+          <text x="105" y="100" text-anchor="middle" class="diagram-sub">横書きで書く・原稿用紙を見る</text>
+          <rect x="20" y="190" width="170" height="90" rx="10" class="diagram-accent" />
+          <text x="105" y="228" text-anchor="middle" class="diagram-text">PC（Chrome）</text>
+          <text x="105" y="250" text-anchor="middle" class="diagram-sub">マス目に直接書く・推敲</text>
+
+          <!-- Vercel -->
+          <rect x="300" y="20" width="180" height="80" rx="10" class="diagram-box" />
+          <text x="390" y="54" text-anchor="middle" class="diagram-text">Vercel</text>
+          <text x="390" y="76" text-anchor="middle" class="diagram-sub">アプリの画面を配る</text>
+
+          <!-- GitHub -->
+          <rect x="570" y="20" width="170" height="80" rx="10" class="diagram-box" />
+          <text x="655" y="54" text-anchor="middle" class="diagram-text">GitHub</text>
+          <text x="655" y="76" text-anchor="middle" class="diagram-sub">プログラムの置き場所</text>
+
+          <!-- Firebase -->
+          <rect x="300" y="150" width="440" height="160" rx="10" class="diagram-box" />
+          <text x="520" y="178" text-anchor="middle" class="diagram-text">Firebase（Google）</text>
+          <rect x="320" y="195" width="190" height="95" rx="8" class="diagram-accent" />
+          <text x="415" y="232" text-anchor="middle" class="diagram-text">Authentication</text>
+          <text x="415" y="254" text-anchor="middle" class="diagram-sub">Google でログイン</text>
+          <rect x="530" y="195" width="190" height="95" rx="8" class="diagram-accent" />
+          <text x="625" y="232" text-anchor="middle" class="diagram-text">Cloud Firestore</text>
+          <text x="625" y="254" text-anchor="middle" class="diagram-sub">作品・章・設定を保存</text>
+
+          <!-- 矢印 -->
+          <path d="M190,70 L298,60" class="diagram-line" marker-end="url(#arrow)" />
+          <path d="M190,220 C250,180 260,110 298,85" class="diagram-line" marker-end="url(#arrow)" />
+          <path d="M568,60 L482,60" class="diagram-line" marker-end="url(#arrow)" />
+          <path d="M190,100 C250,130 280,200 318,230" class="diagram-line" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          <path d="M190,250 L318,250" class="diagram-line" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          <text x="525" y="125" text-anchor="middle" class="diagram-sub">更新すると自動で配り直す</text>
+        </svg></div>
+        <figcaption>図1　GENKO の構成。端末は Vercel から画面を受け取り、ログインと保存は Firebase と直接やり取りする</figcaption>
+      </figure>
+      <div class="table-wrap">
+        <table>
+          <tr><th>部分</th><th>役割</th></tr>
+          <tr><td>端末（iPhone・PC）</td><td>ブラウザの中で GENKO の画面が動く。原稿用紙への割り付けや枚数の計算も、端末の中で行う</td></tr>
+          <tr><td>Vercel</td><td>GENKO の画面（プログラム）を配る場所。GitHub に新しいプログラムを置くと、自動で配り直す</td></tr>
+          <tr><td>Firebase Authentication</td><td>Google アカウントでのログインを受け持つ</td></tr>
+          <tr><td>Cloud Firestore</td><td>作品・章・設定を保存するデータベース。変更があると、開いているほかの端末にすぐ知らせる</td></tr>
+          <tr><td>GitHub</td><td>プログラムの置き場所。変更の履歴も残る</td></tr>
+        </table>
+      </div>
+      <p>それぞれの技術を選んだ理由は「<a href="tech-spec.html">技術仕様書</a>」にまとめています。</p>
+
+      <h2 id="functions">2. 機能の一覧</h2>
+      <p>優先度：MVP＝フェーズ1（完成）、P2＝フェーズ2、P3＝フェーズ3（どちらも予定）</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>ID</th><th>分類</th><th>機能</th><th>優先度</th></tr>
+          <tr><td>W-01</td><td>書く</td><td>ルビ（カクヨム式の記法で入力し、表示に反映）</td><td>MVP</td></tr>
+          <tr><td>W-02</td><td>書く</td><td>傍点</td><td>MVP</td></tr>
+          <tr><td>W-03</td><td>書く</td><td>縦中横（2桁までの数字を自動で。手動の指定も）</td><td>P2</td></tr>
+          <tr><td>W-04</td><td>書く</td><td>禁則処理（行頭・行末の禁則、ぶら下げ）</td><td>MVP</td></tr>
+          <tr><td>W-05</td><td>書く</td><td>記号入力補助（記号入力バー）</td><td>MVP</td></tr>
+          <tr><td>W-06</td><td>書く</td><td>段落頭の自動字下げ（ON／OFF）</td><td>MVP</td></tr>
+          <tr><td>W-07</td><td>書く</td><td>検索・置換</td><td>P2</td></tr>
+          <tr><td>W-08</td><td>書く</td><td>元に戻す・やり直し</td><td>MVP</td></tr>
+          <tr><td>G-01</td><td>原稿用紙</td><td>縦書き原稿用紙モード（PC はマス目に直接入力、スマホは表示のみ）</td><td>MVP</td></tr>
+          <tr><td>G-02</td><td>原稿用紙</td><td>横書きモード</td><td>MVP</td></tr>
+          <tr><td>G-03</td><td>原稿用紙</td><td>両モードの切り替え（同じ本文を共有）</td><td>MVP</td></tr>
+          <tr><td>G-04</td><td>原稿用紙</td><td>字数×行数の設定、プリセット</td><td>MVP</td></tr>
+          <tr><td>G-05</td><td>原稿用紙</td><td>マス目のデザイン（罫線の色、背景、フォント）</td><td>P2</td></tr>
+          <tr><td>G-06</td><td>原稿用紙</td><td>ページ送りの方法の選択</td><td>P2</td></tr>
+          <tr><td>G-07</td><td>原稿用紙</td><td>枚数・文字数の表示</td><td>MVP</td></tr>
+          <tr><td>M-01</td><td>管理</td><td>作品一覧（作成・名前変更・削除・並べ替え）</td><td>MVP</td></tr>
+          <tr><td>M-02</td><td>管理</td><td>作品の中の章の構成と並べ替え</td><td>MVP</td></tr>
+          <tr><td>M-03</td><td>管理</td><td>プロット</td><td>P2</td></tr>
+          <tr><td>M-04</td><td>管理</td><td>キャラクター設定</td><td>P2</td></tr>
+          <tr><td>M-05</td><td>管理</td><td>作品ごとのメモ</td><td>P2</td></tr>
+          <tr><td>M-06</td><td>管理</td><td>執筆画面から資料を横に開いて参照</td><td>P3</td></tr>
+          <tr><td>IO-01</td><td>入出力</td><td>.txt の読み込み（UTF-8／Shift_JIS を自動で判定）</td><td>MVP</td></tr>
+          <tr><td>IO-02</td><td>入出力</td><td>.txt の書き出し（章ごと、または作品まとめて）</td><td>MVP</td></tr>
+          <tr><td>IO-03</td><td>入出力</td><td>Word（.docx）の読み込み・書き出し</td><td>P3</td></tr>
+          <tr><td>IO-04</td><td>入出力</td><td>カクヨム形式でのコピー・書き出し</td><td>P2</td></tr>
+          <tr><td>IO-05</td><td>入出力</td><td>原稿用紙イメージの PDF 出力</td><td>P2</td></tr>
+          <tr><td>IO-06</td><td>入出力</td><td>印刷</td><td>P2</td></tr>
+          <tr><td>S-01</td><td>保存・同期</td><td>サーバーへの保存とログイン</td><td>MVP</td></tr>
+          <tr><td>S-02</td><td>保存・同期</td><td>自動保存（入力が止まってから2秒後）</td><td>MVP</td></tr>
+          <tr><td>S-03</td><td>保存・同期</td><td>オフライン編集と、つながったときの自動同期</td><td>P2</td></tr>
+          <tr><td>S-04</td><td>保存・同期</td><td>同時に編集したときの扱い（両方の版を残して選ぶ）</td><td>P2</td></tr>
+          <tr><td>S-05</td><td>保存・同期</td><td>バックアップ（全データの書き出し）</td><td>MVP</td></tr>
+          <tr><td>S-06</td><td>保存・同期</td><td>変更履歴と過去の版への復元</td><td>P3</td></tr>
+          <tr><td>O-01</td><td>その他</td><td>文字数の目標と進み具合</td><td>P2</td></tr>
+          <tr><td>O-02</td><td>その他</td><td>執筆ログ（日ごとの文字数の記録とグラフ）</td><td>P3</td></tr>
+          <tr><td>O-03</td><td>その他</td><td>ホーム画面に追加してアプリのように起動（PWA）</td><td>P2</td></tr>
+        </table>
+      </div>
+
+      <h2 id="screens">3. 画面の一覧と行き来</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>画面</th><th>内容</th></tr>
+          <tr><td>ログイン</td><td>「Google でログイン」のボタンだけ。持ち主以外のアカウントは「このアカウントでは利用できません」と表示してログアウト</td></tr>
+          <tr><td>作品一覧</td><td>作品の一覧（タイトル、枚数、章の数、最終更新）。作成・名前変更・削除・並べ替え。全作品のバックアップ</td></tr>
+          <tr><td>章一覧</td><td>章の一覧（タイトル、枚数、文字数、最終更新）。追加・名前変更・削除・並べ替え。.txt の読み込み・書き出し</td></tr>
+          <tr><td>執筆</td><td>本文の編集。モードの切り替え、記号入力バー、枚数・文字数・保存状態の表示。PC では左に章一覧</td></tr>
+          <tr><td>設定</td><td>字数×行数とプリセット、自動字下げ、適用先（作品ごと／既定値）、ログアウト</td></tr>
+        </table>
+      </div>
+      <pre><code>ログイン → 作品一覧 → 章一覧 → 執筆
+              ↓         ↓        ↓
+             設定  ←─── 各画面の右上の ⚙ から開く</code></pre>
+      <ul>
+        <li>ログインすると、前回最後に開いていた章の執筆画面を直接開く</li>
+        <li>画面はアドレスの「#」以降で切り替わる（例：<code>#/works/作品ID</code>）。スマホの「戻る」操作もそのまま使える</li>
+      </ul>
+
+      <h2 id="layout">4. 執筆画面の配置</h2>
+      <h3>PC</h3>
+      <pre><code>┌──────────────────────────────────────────────────┐
+│ ← 作品名／章名    [横書き｜原稿用紙]  枚数・文字数 保存状態 ⚙ │
+├──────────┬───────────────────────────────────────┤
+│ 章一覧    │                                       │
+│ 第1話     │   本文                                 │
+│ 第2話     │   （原稿用紙モード：マス目に直接入力）    │
+│ ＋章を追加 │   （横書きモード：ふつうの入力欄）        │
+├──────────┴───────────────────────────────────────┤
+│ [記号入力バー]                                      │
+└──────────────────────────────────────────────────┘</code></pre>
+      <h3>スマホ</h3>
+      <pre><code>┌────────────────────────┐
+│ ← 章名   [モード切替]  ⚙ │
+│   枚数・文字数 保存状態    │
+├────────────────────────┤
+│   本文（全画面）          │
+├────────────────────────┤
+│ [元に戻す][やり直し][記号…]│ ← キーボードのすぐ上
+└────────────────────────┘</code></pre>
+      <h3>デザインの方針</h3>
+      <ul>
+        <li>背景は生成りの紙色、本文は明朝体、操作の部品はゴシック体</li>
+        <li>ダークモードあり。端末の設定に自動で合わせる</li>
+        <li>原稿用紙の罫線は、ライトでは淡い朱色、ダークでは淡いグレー</li>
+        <li>装飾は控えめにし、本文に集中できる見た目にする</li>
+      </ul>
+
+      <h2 id="data">5. データの全体像</h2>
+      <p>データは「ユーザー → 作品 → 章」の3段階で保存します。</p>
+      <pre><code>ユーザー（持ち主1人分）     設定、最後に開いた章
+  └─ 作品                    タイトル、並び順、作品ごとの設定
+       └─ 章                 タイトル、並び順、本文、文字数</code></pre>
+      <ul>
+        <li><strong>本文はプレーンテキスト</strong>で保存する。ルビ・傍点はカクヨム式の記法のまま入っている</li>
+        <li><strong>原稿用紙のどのマスに何があるか、は保存しない</strong>。表示するたびに本文から割り付ける。設定を変えればすぐに割り付けが変わるのは、このため</li>
+        <li>枚数も設定で変わるので保存しない。文字数は一覧に表示するため、保存のときに数えておく</li>
+        <li>章ごとに1つの記録。1つの記録の上限は約1MB（日本語で約30万字）なので、25万字を超えたら章を分けるよう表示する</li>
+      </ul>
+      <p>項目の詳しい定義は「<a href="detail-design.html#data">詳細設計書</a>」にあります。</p>
+
+      <h2 id="nonfunctional">6. 性能・安全性・費用の考え方</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>観点</th><th>求めること</th><th>どう実現しているか</th></tr>
+          <tr><td>性能</td><td>10万字の章でも入力が遅れない</td><td>変わった段落だけを割り付けし直す。原稿用紙は見えているページだけを描く</td></tr>
+          <tr><td>保存の確実さ</td><td>通信が切れても文字が消えない</td><td>書いた内容を先に端末の中へ保存し、つながったらサーバーへ送る</td></tr>
+          <tr><td>安全性</td><td>持ち主だけが読み書きできる</td><td>サーバー側のアクセス規則で、持ち主のアカウント以外を拒否する</td></tr>
+          <tr><td>費用</td><td>月額0円</td><td>Vercel・Firebase の無料の範囲で使う</td></tr>
+          <tr><td>保守</td><td>AI で直し続けられる</td><td>使う部品を最小限にし、原稿用紙の処理は自動テストで守る</td></tr>
+        </table>
+      </div>
+
+      <div class="doc-footer">
+        <span>対象：フェーズ1（MVP）</span>
+        <span>最終更新 2026-11-03</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

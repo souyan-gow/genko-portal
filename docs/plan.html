@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>企画書｜GENKO ドキュメント</title>
+  <link rel="stylesheet" href="../assets/style.css?v=20261103">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-logo" href="../index.html">GENKO<small>ドキュメント</small></a>
+      <nav><a href="../index.html">一覧へ戻る</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="doc">
+      <span class="doc-kind">アプリの説明</span>
+      <h1>企画書</h1>
+      <p class="lead">GENKO を作った目的と、何を実現するアプリなのかをまとめます。</p>
+
+      <nav class="toc">
+        <strong>目次</strong>
+        <ol>
+          <li><a href="#summary">概要</a></li>
+          <li><a href="#background">背景と困りごと</a></li>
+          <li><a href="#users">使う人と使う場面</a></li>
+          <li><a href="#policy">解決の方針</a></li>
+          <li><a href="#features">主な機能</a></li>
+          <li><a href="#difference">ほかの道具との違い</a></li>
+          <li><a href="#scope">やらないこと</a></li>
+          <li><a href="#constraints">前提と制約</a></li>
+          <li><a href="#roadmap">段階的な計画</a></li>
+          <li><a href="#success">うまくいったと言える基準</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="summary">1. 概要</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>名前</th><td>GENKO（げんこう）</td></tr>
+          <tr><th>ひとことで</th><td>スマホと PC のどちらからでも同じ原稿を、縦書きの原稿用紙と横書きの両方で書ける、個人用の執筆アプリ</td></tr>
+          <tr><th>使う人</th><td>持ち主1人だけ（一般には公開しない）</td></tr>
+          <tr><th>主な用途</th><td>小説の執筆（カクヨムへの投稿を含む）、作文・提出物の下書き</td></tr>
+          <tr><th>形</th><td>ブラウザで開く Web アプリ（インストール不要）</td></tr>
+        </table>
+      </div>
+
+      <h2 id="background">2. 背景と困りごと</h2>
+      <p>小説や作文を書くとき、次のような困りごとがありました。</p>
+      <ul>
+        <li><strong>書く場所がばらばら</strong>：移動中はスマホ、家では PC で書きたい。しかし、端末をまたいで同じ原稿を書き続けられる道具が少ない</li>
+        <li><strong>原稿用紙の感覚がつかめない</strong>：応募や提出では「400字詰め原稿用紙◯枚」で長さが決められていることが多い。横書きのエディタでは、文字数はわかっても枚数がわからない</li>
+        <li><strong>縦書きで推敲したい</strong>：縦書きで読むと、横書きのときとは違う気づきがある。しかし、縦書きで直接書ける道具は限られる</li>
+        <li><strong>ルビの書き方がそろわない</strong>：投稿先（カクヨム）の書き方と、ふだん使う道具の書き方が違うと、投稿のたびに直す手間がかかる</li>
+      </ul>
+
+      <h2 id="users">3. 使う人と使う場面</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>場面</th><th>端末</th><th>やりたいこと</th></tr>
+          <tr><td>移動中・すきま時間</td><td>iPhone</td><td>思いついた文章を、すぐに書き足す</td></tr>
+          <tr><td>自宅でじっくり</td><td>PC</td><td>原稿用紙のマス目で見ながら推敲する。枚数を確かめる</td></tr>
+          <tr><td>投稿・提出の前</td><td>PC</td><td>.txt に書き出して、投稿サイトに貼り付ける</td></tr>
+        </table>
+      </div>
+
+      <h2 id="policy">4. 解決の方針</h2>
+      <ul>
+        <li><strong>原稿はサーバーに置く</strong>：どの端末から開いても同じ原稿。書いた内容は自動で保存し、ほかの端末にもすぐに届ける</li>
+        <li><strong>1つの本文を2通りに見せる</strong>：本文は1つだけ持ち、横書きと縦書きの原稿用紙は「見せ方」の違いとして切り替える</li>
+        <li><strong>原稿用紙のルールに忠実に</strong>：禁則処理やルビの扱いなど、原稿用紙の決まりに沿ってマスに割り付け、正確な枚数を出す</li>
+        <li><strong>書き方はカクヨムに合わせる</strong>：ルビ・傍点の書き方をカクヨム式にそろえ、投稿のときに直す手間をなくす</li>
+        <li><strong>端末ごとに得意なことを</strong>：スマホは横書きで素早く書く、PC はマス目に直接書いて推敲する</li>
+      </ul>
+
+      <h2 id="features">5. 主な機能</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>分類</th><th>機能</th></tr>
+          <tr><td>書く</td><td>ルビ・傍点、禁則処理、段落頭の自動字下げ、記号入力バー、元に戻す・やり直し</td></tr>
+          <tr><td>原稿用紙</td><td>縦書き原稿用紙モード（PC はマス目に直接入力）、横書きモード、モードの切り替え、字数×行数の設定、枚数・文字数の表示</td></tr>
+          <tr><td>管理</td><td>作品一覧、作品の中の章の構成と並べ替え</td></tr>
+          <tr><td>入出力</td><td>.txt の読み込み（UTF-8・Shift_JIS）と書き出し</td></tr>
+          <tr><td>保存・同期</td><td>サーバーへの保存とログイン、自動保存、全作品のバックアップ</td></tr>
+        </table>
+      </div>
+      <p>機能の一覧と画面の構成は「<a href="basic-design.html">基本設計書</a>」に、詳しい仕組みは「<a href="detail-design.html">詳細設計書</a>」にまとめています。</p>
+
+      <h2 id="difference">6. ほかの道具との違い</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>道具</th><th>得意なこと</th><th>GENKO が補うこと</th></tr>
+          <tr><td>一般的なメモ・文書アプリ</td><td>端末をまたいだ保存</td><td>縦書きの原稿用紙表示、原稿用紙換算の枚数、ルビ</td></tr>
+          <tr><td>投稿サイトの編集画面</td><td>投稿までの流れ</td><td>縦書きでの推敲、オフラインでも書ける、投稿前の原稿の管理</td></tr>
+          <tr><td>PC の原稿用紙ソフト</td><td>縦書き・原稿用紙の表示</td><td>スマホとの同期、ブラウザだけで使える</td></tr>
+        </table>
+      </div>
+
+      <h2 id="scope">7. やらないこと</h2>
+      <ul>
+        <li>生成AI との連携（文章の自動生成や添削）</li>
+        <li>ほかの人との共同編集や公開（持ち主1人だけが使う）</li>
+        <li>ほかのブラウザや Android への最適化（確認するのは iPhone の Safari と PC の Chrome）</li>
+      </ul>
+
+      <h2 id="constraints">8. 前提と制約</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>内容</th></tr>
+          <tr><td>確認する端末</td><td>iPhone 14（Safari）、PC（Chrome）。画面の幅 360px 以上</td></tr>
+          <tr><td>費用</td><td>月額0円。使うサービスの無料の範囲に収める</td></tr>
+          <tr><td>性能</td><td>10万字の章でも、入力の遅れを感じない</td></tr>
+          <tr><td>安全性</td><td>持ち主のアカウントだけが読み書きできる</td></tr>
+          <tr><td>保存の確実さ</td><td>通信が切れても、書いた文字が消えない</td></tr>
+          <tr><td>作り方</td><td>AI（Claude Code）が作り、持ち主が実機で確かめる。持ち主はプログラマーではないため、資料はわかりやすい言葉で書く</td></tr>
+        </table>
+      </div>
+
+      <h2 id="roadmap">9. 段階的な計画</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>段階</th><th>内容</th><th>状況</th></tr>
+          <tr><td>フェーズ0：技術検証</td><td>PC の縦書きのマス目で、日本語入力（変換中の文字を含む）が崩れないかを確かめる試作</td><td>完了</td></tr>
+          <tr><td>フェーズ1：MVP</td><td>毎日の執筆に使える最低限の18機能</td><td>完了（2026年11月）</td></tr>
+          <tr><td>フェーズ2：執筆を快適に</td><td>縦中横の手動指定、検索・置換、マス目のデザイン、プロット・キャラクター設定・メモ、PDF 出力・印刷、オフライン編集の強化、同時編集の扱い、文字数目標、ホーム画面からの起動 など</td><td>予定</td></tr>
+          <tr><td>フェーズ3：仕上げ</td><td>資料を横に開いての参照、Word ファイルの読み書き、変更履歴と過去の版への復元、執筆ログ</td><td>予定</td></tr>
+        </table>
+      </div>
+
+      <h2 id="success">10. うまくいったと言える基準</h2>
+      <ul>
+        <li>スマホで書いた文章が、PC で再読み込みしなくても5秒以内に表示される</li>
+        <li>原稿用紙モードで、禁則処理やルビが原稿用紙の決まりどおりに表示される</li>
+        <li>原稿用紙換算の枚数が、決まった数え方で正しく出る</li>
+        <li>書いた .txt を投稿サイトに貼り付けると、ルビ・傍点がそのまま使える</li>
+      </ul>
+      <p>フェーズ1では、18項目の受け入れ基準すべてを、自動テストと実機（iPhone・PC）で確かめました。</p>
+
+      <div class="doc-footer">
+        <span>対象：フェーズ1（MVP）</span>
+        <span>最終更新 2026-11-03</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

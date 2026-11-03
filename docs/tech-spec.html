@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>技術仕様書｜GENKO ドキュメント</title>
+  <link rel="stylesheet" href="../assets/style.css?v=20261103">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-logo" href="../index.html">GENKO<small>ドキュメント</small></a>
+      <nav><a href="../index.html">一覧へ戻る</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="doc">
+      <span class="doc-kind">アプリの説明</span>
+      <h1>技術仕様書</h1>
+      <p class="lead">GENKO で使っている技術と、それぞれの役割・使いどころ・選んだ理由をまとめます。</p>
+
+      <nav class="toc">
+        <strong>目次</strong>
+        <ol>
+          <li><a href="#overview">技術の一覧</a></li>
+          <li><a href="#frontend">画面を作る技術</a></li>
+          <li><a href="#vertical">縦書き・ルビを表す技術</a></li>
+          <li><a href="#backend">ログインと保存の技術</a></li>
+          <li><a href="#delivery">配る・管理する・確かめる技術</a></li>
+          <li><a href="#not-used">あえて使っていないもの</a></li>
+          <li><a href="#environment">動作環境と制約</a></li>
+          <li><a href="#structure">プログラムの構成</a></li>
+          <li><a href="#test">テストの方針</a></li>
+          <li><a href="#cost">費用</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="overview">1. 技術の一覧</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>領域</th><th>技術</th><th>版</th><th>ひとことで</th></tr>
+          <tr><td>画面</td><td>React</td><td>19</td><td>画面を部品に分けて作る仕組み</td></tr>
+          <tr><td>画面</td><td>TypeScript</td><td>7</td><td>間違いを見つけやすくしたプログラムの言葉</td></tr>
+          <tr><td>画面</td><td>Vite</td><td>8</td><td>開発中の表示と、公開用のファイル作り</td></tr>
+          <tr><td>縦書き</td><td>CSS の縦書き機能</td><td>—</td><td>文字を縦書きの向きで表示する</td></tr>
+          <tr><td>ルビ</td><td>HTML の ruby 要素</td><td>—</td><td>横書きの読む表示でルビを付ける</td></tr>
+          <tr><td>ログイン</td><td>Firebase Authentication</td><td>13</td><td>Google アカウントでのログイン</td></tr>
+          <tr><td>保存・同期</td><td>Cloud Firestore</td><td>13</td><td>データの保存と、端末どうしの同期</td></tr>
+          <tr><td>配信</td><td>Vercel</td><td>—</td><td>アプリを公開して配る</td></tr>
+          <tr><td>管理</td><td>GitHub</td><td>—</td><td>プログラムと変更の履歴の置き場所</td></tr>
+          <tr><td>テスト</td><td>Vitest</td><td>5</td><td>自動テストを動かす</td></tr>
+        </table>
+      </div>
+
+      <h2 id="frontend">2. 画面を作る技術</h2>
+      <h3>React（リアクト）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>役割</th><td>画面を「部品」に分けて作り、本文やカーソルが変わったら、必要な部分だけを描き直す</td></tr>
+          <tr><th>使いどころ</th><td>すべての画面。原稿用紙のページ・マス、記号入力バー、上部バーなど</td></tr>
+          <tr><th>選んだ理由</th><td>利用者が非常に多く、情報が豊富で、AI でも扱いやすい。「中身が変わらない部品は描き直さない」という仕組みがあり、何百ものマスを持つ原稿用紙を速く描ける</td></tr>
+          <tr><th>ほかの候補</th><td>Vue、Svelte。どちらでも作れるが、利用者の多さと情報量で React を選んだ</td></tr>
+        </table>
+      </div>
+      <h3>TypeScript（タイプスクリプト）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>役割</th><td>プログラムの中の値に「種類（型）」を付け、書き間違いを動かす前に見つける</td></tr>
+          <tr><th>使いどころ</th><td>すべてのプログラム</td></tr>
+          <tr><th>選んだ理由</th><td>原稿用紙の割り付けでは「本文の何文字目」「何行目」「何マス目」など、数字の意味の取り違えが起きやすい。型があると、そうした間違いを早く見つけられる</td></tr>
+          <tr><th>ほかの候補</th><td>JavaScript（型のない言葉）。手軽だが、間違いに気づきにくい</td></tr>
+        </table>
+      </div>
+      <h3>Vite（ヴィート）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>役割</th><td>開発中に手元でアプリを動かす。公開用に、プログラムを小さくまとめたファイルを作る</td></tr>
+          <tr><th>使いどころ</th><td>開発と公開の準備</td></tr>
+          <tr><th>選んだ理由</th><td>起動と更新がとても速く、設定が少ない。Vercel が標準で対応している</td></tr>
+          <tr><th>ほかの候補</th><td>Next.js（サーバーの処理も書ける仕組み）。GENKO はサーバーの処理を Firebase に任せるので、そこまでは要らない</td></tr>
+        </table>
+      </div>
+
+      <h2 id="vertical">3. 縦書き・ルビを表す技術</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>技術</th><th>使いどころ</th><th>選んだ理由</th></tr>
+          <tr>
+            <td>CSS の <code>writing-mode: vertical-rl</code></td>
+            <td>原稿用紙の各マスの文字</td>
+            <td>句読点が右上に寄る、括弧や「ー」が縦向きになる、といった縦書きの文字の形を、ブラウザが正しく出してくれる。自分で文字を回転させると、記号ごとに調整が必要になる</td>
+          </tr>
+          <tr>
+            <td>自前のマス目の配置</td>
+            <td>原稿用紙のマスと行、ページ</td>
+            <td>ブラウザに任せると、禁則やルビの位置が原稿用紙の決まりと合わない。マスの位置は GENKO が計算し、文字の形だけをブラウザに任せる</td>
+          </tr>
+          <tr>
+            <td>CSS の <code>text-combine-upright</code></td>
+            <td>2桁の数字の縦中横</td>
+            <td>1マスに数字を横並びで入れる、ブラウザに備わった機能</td>
+          </tr>
+          <tr>
+            <td>CSS の <code>text-emphasis</code></td>
+            <td>傍点</td>
+            <td>縦書きなら右、横書きなら上に、自動で点を付けてくれる</td>
+          </tr>
+          <tr>
+            <td>HTML の <code>ruby</code> 要素</td>
+            <td>横書きの読む表示のルビ</td>
+            <td>ルビを付けるための HTML の標準の書き方。原稿用紙ではルビをマスの外（行の間）に置く必要があるため、こちらは自前で配置している</td>
+          </tr>
+          <tr>
+            <td>透明な入力欄</td>
+            <td>PC の原稿用紙での日本語入力</td>
+            <td>日本語入力（変換）は、ブラウザの入力欄でしか正しく受け取れない。入力欄の文字を透明にしてカーソルのマスに重ね、受け取った文字をマス目に描く</td>
+          </tr>
+        </table>
+      </div>
+      <div class="note">
+        <p>「マス目に直接入力できるか」は、作り始める前のフェーズ0で、試作して確かめました。変換中の文字がマス目上で崩れないことを確認してから、この方式に決めています。</p>
+      </div>
+
+      <h2 id="backend">4. ログインと保存の技術</h2>
+      <h3>Firebase Authentication（ファイアベース オーセンティケーション）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>役割</th><td>Google アカウントでのログインを受け持つ</td></tr>
+          <tr><th>使いどころ</th><td>ログイン画面。ログイン中の人が持ち主かどうかの判定</td></tr>
+          <tr><th>選んだ理由</th><td>パスワードを GENKO で預からずに済み、Google アカウントの安全性（2段階認証など）をそのまま使える。保存に使う Firestore と組み合わせて、持ち主だけに読み書きを許す規則を作れる</td></tr>
+          <tr><th>やり方の工夫</th><td>ログインは小さな画面（ポップアップ）を開く方式。画面を切り替える方式は、iPhone の Safari のプライバシー保護の機能で失敗することがあるため</td></tr>
+        </table>
+      </div>
+      <h3>Cloud Firestore（クラウド ファイアストア）</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>役割</th><td>作品・章・設定を保存するデータベース</td></tr>
+          <tr><th>使いどころ</th><td>自動保存、作品・章の一覧、設定、ほかの端末での変更の受け取り</td></tr>
+          <tr><th>選んだ理由</th><td>
+            ・<strong>変更をすぐに知らせてくれる</strong>：ほかの端末で書いた内容が、再読み込みしなくても届く<br>
+            ・<strong>端末の中に写しを持てる</strong>：書いた内容を先に端末に保存し、通信が切れても消えない<br>
+            ・<strong>自分でサーバーを用意しなくてよい</strong>：管理の手間がない<br>
+            ・<strong>無料の範囲が広い</strong>：個人の執筆なら無料で収まる
+          </td></tr>
+          <tr><th>やり方の工夫</th><td>端末の中の写し（persistentLocalCache）を有効にし、PC で複数のタブを開いても壊れない設定にしている</td></tr>
+          <tr><th>ほかの候補</th><td>Supabase など。同期とオフラインの扱いのしやすさで Firestore を選んだ</td></tr>
+        </table>
+      </div>
+
+      <h2 id="delivery">5. 配る・管理する・確かめる技術</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>技術</th><th>役割</th><th>選んだ理由</th></tr>
+          <tr><td>Vercel（ヴァーセル）</td><td>アプリを公開して配る</td><td>GitHub にプログラムを置くと、自動で公開し直してくれる。個人の利用なら無料。Vite に標準で対応している</td></tr>
+          <tr><td>GitHub（ギットハブ）</td><td>プログラムの置き場所と変更の履歴</td><td>いつ何を変えたかが残り、前の状態に戻すこともできる。Vercel とつながる</td></tr>
+          <tr><td>Vitest（ヴィテスト）</td><td>自動テストを動かす</td><td>Vite と同じ設定で動き、速い。原稿用紙のルールが壊れていないかを、変更のたびに確かめられる</td></tr>
+        </table>
+      </div>
+      <p>このドキュメントのサイトは、アプリとは別の GitHub のリポジトリに置き、GitHub Pages で公開しています。アプリが止まっても、こちらは見られます。</p>
+
+      <h2 id="not-used">6. あえて使っていないもの</h2>
+      <p>使う部品が少ないほど、壊れにくく、直しやすくなります。次のものは、あえて使わず自前で作っています。</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>よく使われるもの</th><th>使わない理由</th></tr>
+          <tr><td>文章エディタの部品（ProseMirror など）</td><td>横書きの文書向けに作られていて、縦書きのマス目への直接入力や原稿用紙の割り付けには合わない</td></tr>
+          <tr><td>画面切り替えの部品（React Router など）</td><td>画面が5つだけなので、アドレスの「#」以降で切り替える小さな仕組みで足りる</td></tr>
+          <tr><td>ルビ・記法を読み取る部品</td><td>カクヨム式の記法は決まりが少なく、自前で作ったほうが原稿用紙の割り付けと組み合わせやすい</td></tr>
+          <tr><td>見た目の部品集</td><td>色とフォントを細かく決めたいので、自分で書いた見た目（CSS）だけで作っている</td></tr>
+        </table>
+      </div>
+
+      <h2 id="environment">7. 動作環境と制約</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>項目</th><th>内容</th></tr>
+          <tr><td>確かめている端末</td><td>iPhone 14（Safari）、PC（Chrome）</td></tr>
+          <tr><td>画面の幅</td><td>360px 以上</td></tr>
+          <tr><td>iPhone のブラウザ</td><td><strong>Safari のみ</strong>。Google アプリや iPhone 版 Chrome では、ブラウザの制限（サイトをまたいだ情報の受け渡しの制限）でログインできない。必要になれば、ログインを公開先と同じアドレスで行う方式に変えて対応できる</td></tr>
+          <tr><td>スマホの原稿用紙モード</td><td>表示のみ。スマホでマス目に直接入力すると、キーボードと画面の取り合いで操作が難しいため、横書きで書く方式にしている</td></tr>
+          <tr><td>1章の長さ</td><td>保存の上限は約30万字。25万字を超えたら章を分けるよう表示する</td></tr>
+          <tr><td>置けるファイル</td><td>文字（テキスト）だけ。画像や PDF を置くには別の保存場所（Cloud Storage）が必要で、料金プランの変更が要る</td></tr>
+        </table>
+      </div>
+
+      <h2 id="structure">8. プログラムの構成</h2>
+      <pre><code>genko/
+├── docs/                 仕様のドキュメント
+├── firestore.rules       データのアクセス規則
+├── src/
+│   ├── pages/            画面（ログイン、作品一覧、章一覧、執筆、設定）
+│   ├── components/       画面の部品（記号入力バー、モード切替、章一覧など）
+│   ├── editor/
+│   │   ├── layout/       原稿用紙の割り付けとカーソル（画面に依存しない処理）
+│   │   ├── genko/        原稿用紙モード
+│   │   └── yoko/         横書きモード
+│   ├── notation/         ルビ・傍点の記法の読み取り
+│   ├── firebase/         ログイン、データの読み書き、自動保存
+│   ├── io/               .txt の読み書き、バックアップ
+│   └── styles/           色（ライト・ダーク）と共通の見た目
+└── tests/                自動テスト</code></pre>
+      <ul>
+        <li>原稿用紙の割り付け（<code>editor/layout</code>）は、画面とは切り離した処理にしている。そのため、自動テストで正しさを確かめられる</li>
+        <li>色はすべて一か所（<code>styles</code>）で管理し、ライトとダークの両方を決めている</li>
+        <li>Firebase の設定値は、プログラムの置き場所（GitHub）には入れず、手元と Vercel にだけ登録している。なお、Firebase の Web 用の設定値はもともと秘密の値ではなく、データはアクセス規則で守っている</li>
+      </ul>
+
+      <h2 id="test">9. テストの方針</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>確かめ方</th><th>対象</th></tr>
+          <tr><td>自動テスト（119件）</td><td>原稿用紙の割り付け（禁則、記号のマス数、ルビ、字下げ、ページ跨ぎ、枚数・文字数の数え方）、記法の読み取り、カーソルと削除、記号入力バー、元に戻す、設定の2段階、.txt の読み書き、バックアップの形式</td></tr>
+          <tr><td>持ち主が実機で確認</td><td>見た目と操作感、日本語入力、スマホのキーボードまわり、ログイン、保存と同期</td></tr>
+        </table>
+      </div>
+      <p>原稿用紙のルール（<code>docs/genko-rules.md</code>）に書かれた例は、すべてそのまま自動テストにしています。</p>
+
+      <h2 id="cost">10. 費用</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>サービス</th><th>プラン</th><th>月額</th><th>無料で収まる理由</th></tr>
+          <tr><td>Firebase（Authentication・Firestore）</td><td>無料プラン（Spark）</td><td>0円</td><td>使う人が1人で、データは文字だけ。保存は入力が止まったときだけ行うので、書き込みの回数も少ない</td></tr>
+          <tr><td>Vercel</td><td>無料プラン（Hobby）</td><td>0円</td><td>個人の利用で、配るファイルも小さい</td></tr>
+          <tr><td>GitHub（GitHub Pages を含む）</td><td>無料プラン</td><td>0円</td><td>ドキュメントのサイトは公開のリポジトリで配っている</td></tr>
+        </table>
+      </div>
+
+      <div class="doc-footer">
+        <span>対象：フェーズ1（MVP）</span>
+        <span>最終更新 2026-11-03</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>
